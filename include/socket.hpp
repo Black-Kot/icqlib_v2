@@ -1,9 +1,11 @@
-#include <base.h>
+#include <base.hpp>
 
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+
+#include <parser.hpp>
 
 #define MAX_BUF 0x2400
 
@@ -18,7 +20,7 @@ namespace icq {
 
 	 class Socket {
 		public:
-			Socket(std::string host, int port);
+			Socket(class parser* iparser, std::string host, int port);
 
 			~Socket();
 
@@ -39,6 +41,9 @@ namespace icq {
 			int sockfd;
 			std::mutex m;
 			struct sockaddr_in server;
+			bool connected;
+
+			class parser* iparser;
 	 };
 
 

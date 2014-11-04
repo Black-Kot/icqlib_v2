@@ -15,7 +15,7 @@
 #include <chrono>
 #include <cerrno>
 #include <unistd.h>
-
+#include <icq_types.hpp>
 
 namespace icq {
 

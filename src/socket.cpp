@@ -2,22 +2,7 @@
 
 namespace icq {
 
-	Socket::Socket(std::string host, int port) {
-
-		if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-			return;
-		}
-		int TRUE = 1;
-		struct timeval tv;
-		tv.tv_sec = 60;
-		tv.tv_usec = 0;
-		if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv)) {
-			perror("setsockopt: rcvtimeo");
-		}
-		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*) &TRUE, sizeof (int));
-#ifdef SO_NOSIGPIPE
-		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (void*) &TRUE, sizeof (int));
-#endif
+	Socket::Socket(class parser* _iparser, std::string host, int port) {
 		struct hostent* h;
 		if ((h = gethostbyname(host.c_str())) == 0) {
 			sockfd = -1;
@@ -32,6 +17,8 @@ namespace icq {
 		free(h);
 		server.sin_family = AF_INET;
 		server.sin_port = htons(port);
+		iparser = _iparser;
+		connected = false;
 	}
 
 	Socket::~Socket(){
@@ -39,14 +26,27 @@ namespace icq {
 	};
 
 	bool Socket::connect(){
-		if (sockfd != -1) {
+		if (sockfd && !connected) {
 			return true;
 		}
-
+		if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
+			return false;
+		}
+		int TRUE = 1;
+		struct timeval tv;
+		tv.tv_sec = 60;
+		tv.tv_usec = 0;
+		if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv)) {
+			perror("setsockopt: rcvtimeo");
+		}
+		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*) &TRUE, sizeof (int));
+#ifdef SO_NOSIGPIPE
+		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (void*) &TRUE, sizeof (int));
+#endif
 		if (::connect(sockfd, (struct sockaddr *) &server, sizeof (struct sockaddr)) < 0) {
 			return false;
 		}
-
+		connected = true;
 		return true;
 	};
 
@@ -55,6 +55,7 @@ namespace icq {
 			return;
 		close(sockfd);
 		sockfd = -1;
+		connected = false;
 	};
 
 	ConnErrorNo Socket::recv(){
