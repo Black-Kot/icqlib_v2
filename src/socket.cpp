@@ -46,6 +46,7 @@ namespace icq {
 		if (::connect(sockfd, (struct sockaddr *) &server, sizeof (struct sockaddr)) < 0) {
 			return false;
 		}
+		wLocalSequence = generate_flap_sequence();
 		connected = true;
 		return true;
 	};
@@ -94,20 +95,6 @@ namespace icq {
 	bool Socket::changeHost(std::string host, int port){
 		disconnect();
 
-		if ((sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-			return false;
-		}
-		int TRUE = 1;
-		struct timeval tv;
-		tv.tv_sec = 60;
-		tv.tv_usec = 0;
-		if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof tv)) {
-			perror("setsockopt: rcvtimeo");
-		}
-		setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*) &TRUE, sizeof (int));
-#ifdef SO_NOSIGPIPE
-		setsockopt(sockfd, SOL_SOCKET, SO_NOSIGPIPE, (void*) &TRUE, sizeof (int));
-#endif
 		struct hostent* h;
 		if ((h = gethostbyname(host.c_str())) == 0) {
 			sockfd = -1;

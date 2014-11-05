@@ -18,6 +18,9 @@ namespace icq {
 
 		ConnErrorNo recv();
 
+		//
+		byte m_bConnectionLost;
+
 		private:
 
 		class socket* sock;

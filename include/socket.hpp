@@ -42,8 +42,15 @@ namespace icq {
 			std::mutex m;
 			struct sockaddr_in server;
 			bool connected;
-
+			word wLocalSequence;
 			class parser* iparser;
+
+
+			word generate_flap_sequence() {
+				word n = rand(), s = 0;
+				for (word i = n; i >>= 3; s += i);
+				return (((0 - s) ^ (byte)n) & 7 ^ n) + 2;
+			}
 	 };
 
 

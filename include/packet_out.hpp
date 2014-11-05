@@ -27,6 +27,20 @@ namespace icq {
 
 		void writeGuid(guid g);
 
+		void writeTlvByte(word type, byte data);
+
+		void writeTlvString(word type, word len, byte* data);
+
+		void writeTlvWord(word type, word data);
+
+		void writeTlvDWord(word type, dword data);
+
+		void writeTlvQWord(word type, qword data);
+
+		void setSeq(word seq);
+
+		void setSize(word size);
+
 		byte* getBuf();
 
 		ssize_t getSize();
@@ -36,5 +50,5 @@ namespace icq {
 		vector<byte> buf;
 
 	};
-	
+
 }

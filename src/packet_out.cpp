@@ -30,28 +30,28 @@ namespace icq {
 		};
 
 		void packet_out::writeWord(word w){
-			writeByte((wValue & 0xff00) >> 8);
-			writeByte(wValue & 0x00ff);
+			writeByte((w & 0xff00) >> 8);
+			writeByte(w & 0x00ff);
 		};
 
 		void packet_out::writeLEWord(word w){
-			writeByte(wValue & 0x00ff);
-			writeByte((wValue & 0xff00) >> 8);
+			writeByte(w & 0x00ff);
+			writeByte((w & 0xff00) >> 8);
 
 		};
 
-		void packet_out::writeDWord(dword qw){
-			writeByte((dwValue & 0xff000000) >> 24);
-			writeByte((dwValue & 0x00ff0000) >> 16);
-			writeByte((dwValue & 0x0000ff00) >> 8);
-			writeByte(dwValue & 0x000000ff);
+		void packet_out::writeDWord(dword dw){
+			writeByte((dw & 0xff000000) >> 24);
+			writeByte((dw & 0x00ff0000) >> 16);
+			writeByte((dw & 0x0000ff00) >> 8);
+			writeByte(dw & 0x000000ff);
 		};
 
-		void packet_out::writeLEDWord(dword qw){
-			writeByte(dwValue & 0x000000ff);
-			writeByte((dwValue & 0x0000ff00) >> 8);
-			writeByte((dwValue & 0x00ff0000) >> 16);
-			writeByte((dwValue & 0xff000000) >> 24);
+		void packet_out::writeLEDWord(dword dw){
+			writeByte(dw & 0x000000ff);
+			writeByte((dw & 0x0000ff00) >> 8);
+			writeByte((dw & 0x00ff0000) >> 16);
+			writeByte((dw & 0xff000000) >> 24);
 		};
 
 		void packet_out::writeQWord(qword qw){
@@ -66,6 +66,46 @@ namespace icq {
 
 		void packet_out::writeGuid(guid g){
 			writeString(g, 16);
+		};
+
+		void packet_out::writeTlvByte(word type, byte data){
+			writeWord(type);
+			writeWord(0x0001);
+			writeByte(data);
+		};
+
+		void packet_out::writeTlvString(word type, word len, byte* data){
+			writeWord(type);
+			writeWord(len);
+			writeString(data);
+		};
+
+		void packet_out::writeTlvWord(word type, word data){
+			writeWord(type);
+			writeWord(0x0002);
+			writeWord(data);
+		};
+
+		void packet_out::writeTlvDWord(word type, dword data){
+			writeWord(type);
+			writeWord(0x0004);
+			writeDWord(data);
+		};
+
+		void packet_out::writeTlvQWord(word type, qword data){
+			writeWord(type);
+			writeWord(0x0008);
+			writeQWord(data);
+		};
+
+		void packet_out::setSeq(word seq){
+			buf[3] = (seq & 0x00ff);
+			buf[4] = (seq >> 8 & 0xff00);
+		};
+
+		void packet_out::setSize(word size){
+			buf[5] = (size & 0x00ff);
+			buf[6] = (size >> 8 & 0xff00);
 		};
 
 		byte* packet_out::getBuf(){
